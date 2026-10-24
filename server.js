@@ -20,9 +20,11 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// Serve static frontend files
+// Serve static frontend files (both root and subpath /picopark)
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/picopark', express.static(path.join(__dirname, 'public')));
 app.use('/shared', express.static(path.join(__dirname, 'shared')));
+app.use('/picopark/shared', express.static(path.join(__dirname, 'shared')));
 
 // Health check endpoint for hosting providers (Render, Railway, etc.)
 app.get('/health', (req, res) => {

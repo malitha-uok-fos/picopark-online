@@ -2,7 +2,10 @@
 // Client Networking, Controls, and UI Management
 
 (function () {
-  const socket = io();
+  const basePath = window.location.pathname.replace(/\/+$/, '');
+  const socket = io({
+    path: basePath ? basePath + '/socket.io' : '/socket.io'
+  });
 
   // State
   let localPlayerId = null;
