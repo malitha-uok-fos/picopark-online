@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PICO PARK Online - Multiplayer Web Co-op</title>
+  <meta name="description" content="Play the cooperative multiplayer puzzle platformer Pico Park directly in your browser with your friends!">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+  <div id="appContainer">
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="toast hidden"></div>
+
+    <!-- 1. Lobby Screen -->
+    <div id="lobbyScreen" class="screen-overlay">
+      <div class="lobby-card glassmorphism">
+        <div class="logo-container">
+          <div class="mascot-cat cyan"></div>
+          <div class="mascot-cat pink"></div>
+          <h1 class="game-logo">PICO <span class="logo-highlight">PARK</span></h1>
+          <div class="mascot-cat lime"></div>
+          <div class="mascot-cat orange"></div>
+        </div>
+        <p class="tagline">The Co-op Multiplayer Cat Puzzle Action Game</p>
+
+        <!-- Player Customization -->
+        <div class="form-section">
+          <label for="playerNameInput" class="form-label">Your Nickname</label>
+          <input type="text" id="playerNameInput" class="custom-input" placeholder="Enter your name" maxlength="14" value="Kitty">
+        </div>
+
+        <div class="form-section">
+          <label class="form-label">Choose Your Cat Color</label>
+          <div id="colorPickerContainer" class="color-picker-grid"></div>
+        </div>
+
+        <!-- Room Actions -->
+        <div class="action-buttons-group">
+          <button id="createRoomBtn" class="btn btn-primary btn-glow">
+            <span class="btn-icon">🎮</span> Create New Room
+          </button>
+
+          <div class="divider">
+            <span>OR JOIN A FRIEND</span>
+          </div>
+
+          <div class="join-room-row">
+            <input type="text" id="roomCodeInput" class="custom-input room-code-input" placeholder="ROOM CODE" maxlength="5">
+            <button id="joinRoomBtn" class="btn btn-secondary">
+              Join Room
+            </button>
+          </div>
+        </div>
+
+        <!-- Instructions & Controls Guide -->
+        <div class="controls-guide">
+          <h3>🕹️ How to Play with Friends:</h3>
+          <div class="guide-grid">
+            <div class="guide-item">
+              <span class="guide-key">A / D / ◄ ►</span>
+              <span class="guide-desc">Move Left / Right</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">W / ▲ / Space</span>
+              <span class="guide-desc">Jump</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">1 - 7</span>
+              <span class="guide-desc">Send Emotes</span>
+            </div>
+            <div class="guide-item">
+              <span class="guide-key">Enter</span>
+              <span class="guide-desc">Open Chat</span>
+            </div>
+          </div>
+          <p class="guide-tip">💡 <strong>Pro Tip:</strong> Jump on each other's heads to stack and reach high ledges! Push heavy blocks together!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Main Game Screen -->
+    <div id="gameScreen" class="game-screen hidden">
+      <!-- Top HUD Bar -->
+      <header class="game-header">
+        <div class="header-left">
+          <div class="room-info-pill">
+            <span class="room-label">ROOM:</span>
+            <span id="roomBadge" class="room-code-badge">-----</span>
+            <button id="copyInviteBtn" class="btn btn-pill" title="Copy Direct Invite Link">📋 Copy Link</button>
+          </div>
+          <button id="muteBtn" class="btn btn-pill">🔊 Sound: On</button>
+        </div>
+
+        <div class="header-center">
+          <h2 id="stageTitle" class="stage-title">Stage 1</h2>
+          <span id="stageHint" class="stage-hint">Stack on each other's heads!</span>
+        </div>
+
+        <div class="header-right">
+          <div class="host-controls">
+            <select id="stageSelect" class="stage-select-dropdown" title="Select Stage (Host Only)" disabled></select>
+            <button id="restartStageBtn" class="btn btn-pill btn-danger" title="Restart Stage" disabled>🔄 Restart</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Canvas Viewport -->
+      <main class="canvas-wrapper">
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+
+        <!-- Stage Clear Banner Overlay -->
+        <div id="clearOverlay" class="clear-banner-overlay hidden">
+          <div class="clear-content">
+            <div class="stars-row">⭐⭐⭐</div>
+            <h1 class="clear-text">STAGE CLEAR!</h1>
+            <p class="clear-subtext">Amazing Teamwork! Advancing to next stage...</p>
+          </div>
+        </div>
+      </main>
+
+      <!-- Bottom Controls & Emotes Bar -->
+      <footer class="game-footer">
+        <!-- Emote Wheel Bar -->
+        <div class="emote-bar">
+          <button class="emote-btn" data-emote="hi" title="[1] Hi!">👋</button>
+          <button class="emote-btn" data-emote="jump" title="[2] Jump!">⬆️</button>
+          <button class="emote-btn" data-emote="push" title="[3] Push!">➡️</button>
+          <button class="emote-btn" data-emote="wait" title="[4] Wait!">⚠️</button>
+          <button class="emote-btn" data-emote="love" title="[5] Love">💖</button>
+          <button class="emote-btn" data-emote="oops" title="[6] Oops!">😱</button>
+          <button class="emote-btn" data-emote="yay" title="[7] Yay!">🎉</button>
+        </div>
+
+        <!-- In-game Chat Box -->
+        <div class="chat-widget">
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Press Enter to chat..." maxlength="80">
+            <button id="sendChatBtn" class="btn-chat-send">Send</button>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Mobile Touch Controls Overlay (visible on touch devices) -->
+      <div id="touchControls" class="touch-controls">
+        <div class="touch-left-group">
+          <button id="btnTouchLeft" class="touch-btn">◀</button>
+          <button id="btnTouchRight" class="touch-btn">▶</button>
+        </div>
+        <div class="touch-right-group">
+          <button id="btnTouchJump" class="touch-btn touch-jump">JUMP</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Socket.io & Game Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/audio.js?v=3"></script>
+  <script src="js/renderer.js?v=3"></script>
+  <script src="js/client.js?v=3"></script>
+</body>
+</html>
