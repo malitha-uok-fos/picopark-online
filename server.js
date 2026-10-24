@@ -15,6 +15,14 @@ const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
+  },
+  transports: ['polling', 'websocket']
+});
+
+// Intercept and normalize subfolder socket.io requests under Passenger / cPanel
+server.prependListener('request', (req, res) => {
+  if (req.url && req.url.startsWith('/picopark/socket.io')) {
+    req.url = req.url.replace('/picopark/socket.io', '/socket.io');
   }
 });
 

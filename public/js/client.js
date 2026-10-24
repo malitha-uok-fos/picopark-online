@@ -4,7 +4,16 @@
 (function () {
   const basePath = window.location.pathname.replace(/\/+$/, '');
   const socket = io({
-    path: basePath ? basePath + '/socket.io' : '/socket.io'
+    path: basePath ? basePath + '/socket.io' : '/socket.io',
+    transports: ['polling', 'websocket']
+  });
+
+  socket.on('connect', () => {
+    console.log('✅ Connected to game server! Socket ID:', socket.id);
+  });
+
+  socket.on('connect_error', (err) => {
+    console.warn('⚠️ Socket connection error:', err);
   });
 
   // State
